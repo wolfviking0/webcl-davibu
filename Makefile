@@ -1,4 +1,4 @@
-EMCC:=../../../webcl-translator/emscripten
+EMCC:=../../webcl-translator/emscripten
 
 EMSCRIPTEN = $(EMCC)
 CXX = $(EMSCRIPTEN)/emcc
