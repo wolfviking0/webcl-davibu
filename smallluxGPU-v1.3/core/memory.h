@@ -25,8 +25,8 @@
 
 #include <malloc.h>
 
-#include <boost/cstdint.hpp>
-using boost::int8_t;
+//#include <boost/cstdint.hpp>
+//using boost::int8_t;
 
 // Memory Allocation Functions
 #if !defined(LUX_ALIGNMENT)

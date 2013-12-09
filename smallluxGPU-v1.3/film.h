@@ -26,7 +26,7 @@
 #include <cstddef>
 #include <cmath>
 
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread/mutex.hpp>
 
 #define __CL_ENABLE_EXCEPTIONS
 #define __NO_STD_VECTOR
@@ -186,7 +186,7 @@ public:
 	}
 
 	virtual void Init(const unsigned int w, unsigned int h) {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		if (pixelsRadiance)
 			delete[] pixelsRadiance;
@@ -213,7 +213,7 @@ public:
 	}
 
 	virtual void Reset() {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		for (unsigned int i = 0; i < pixelCount; ++i) {
 			pixelsRadiance[i] = 0.f;
@@ -224,7 +224,7 @@ public:
 	}
 
 	void UpdateScreenBuffer() {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		UpdateScreenBufferImpl();
 	}
@@ -234,7 +234,7 @@ public:
 	}
 
 	void SplatSampleBuffer(const SampleBuffer *sampleBuffer) {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		const SampleBufferElem *sbe = sampleBuffer->GetSampleBuffer();
 		for (size_t i = 0; i < sampleBuffer->GetSampleCount(); ++i)
@@ -244,7 +244,7 @@ public:
 	}
 
 	void SavePPM(const string &fileName) {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		// Update pixels
 		UpdateScreenBufferImpl();
@@ -299,7 +299,7 @@ protected:
 		}
 	}
 
-	boost::mutex radianceMutex;
+	//boost::mutex radianceMutex;
 	Spectrum *pixelsRadiance;
 	float *pixelWeights;
 
@@ -330,7 +330,7 @@ public:
 	}
 
 	void SplatSampleBuffer(const SampleBuffer *sampleBuffer) {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		const SampleBufferElem *sbe = sampleBuffer->GetSampleBuffer();
 		if (useLargeFilter) {
@@ -360,8 +360,8 @@ private:
 		if (x1 < x0 || y1 < y0 || x1 < 0 || y1 < 0)
 			return;
 
-		for (u_int y = static_cast<u_int>(max<int>(y0, 0)); y <= static_cast<u_int>(min<int>(y1, height - 1)); ++y)
-			for (u_int x = static_cast<u_int>(max<int>(x0, 0)); x <= static_cast<u_int>(min<int>(x1, width - 1)); ++x) {
+		for (unsigned int y = static_cast<unsigned int>(max<int>(y0, 0)); y <= static_cast<unsigned int>(min<int>(y1, height - 1)); ++y)
+			for (unsigned int x = static_cast<unsigned int>(max<int>(x0, 0)); x <= static_cast<unsigned int>(min<int>(x1, width - 1)); ++x) {
 				const unsigned int offset = x + y * width;
 
 				pixelsRadiance[offset] += 0.01f * sampleElem->radiance;
@@ -383,9 +383,9 @@ public:
         // Precompute filter weight table
 		filterTable2x2 = new float[FILTER_TABLE_SIZE * FILTER_TABLE_SIZE];
 		float *ftp2x2 = filterTable2x2;
-		for (u_int y = 0; y < FILTER_TABLE_SIZE; ++y) {
+		for (unsigned int y = 0; y < FILTER_TABLE_SIZE; ++y) {
 			const float fy = (static_cast<float>(y) + .5f) * filter2x2.yWidth / FILTER_TABLE_SIZE;
-			for (u_int x = 0; x < FILTER_TABLE_SIZE; ++x) {
+			for (unsigned int x = 0; x < FILTER_TABLE_SIZE; ++x) {
 				const float fx = (static_cast<float>(x) + .5f) * filter2x2.xWidth / FILTER_TABLE_SIZE;
 				*ftp2x2++ = filter2x2.Evaluate(fx, fy);
 			}
@@ -393,9 +393,9 @@ public:
 
 		filterTable4x4 = new float[FILTER_TABLE_SIZE * FILTER_TABLE_SIZE];
 		float *ftp10x10 = filterTable4x4;
-		for (u_int y = 0; y < FILTER_TABLE_SIZE; ++y) {
+		for (unsigned int y = 0; y < FILTER_TABLE_SIZE; ++y) {
 			const float fy = (static_cast<float>(y) + .5f) * filter4x4.yWidth / FILTER_TABLE_SIZE;
-			for (u_int x = 0; x < FILTER_TABLE_SIZE; ++x) {
+			for (unsigned int x = 0; x < FILTER_TABLE_SIZE; ++x) {
 				const float fx = (static_cast<float>(x) + .5f) * filter4x4.xWidth / FILTER_TABLE_SIZE;
 				*ftp10x10++ = filter4x4.Evaluate(fx, fy);
 			}
@@ -419,7 +419,7 @@ public:
 	}
 
 	void Init(const unsigned int w, unsigned int h) {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		if (pixelsRadiance)
 			delete[] pixelsRadiance;
@@ -448,7 +448,7 @@ public:
 	}
 
 	void Reset() {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		if (lowLatency) {
 			for (unsigned int i = 0; i < pixelCount; ++i) {
@@ -470,7 +470,7 @@ public:
 	}
 
 	void UpdateScreenBuffer() {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		UpdateScreenBufferImpl();
 	}
@@ -480,7 +480,7 @@ public:
 	}
 
 	virtual void SplatSampleBuffer(const SampleBuffer *sampleBuffer) {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		const SampleBufferElem *sbe = sampleBuffer->GetSampleBuffer();
 		if (useLargeFilter) {
@@ -495,7 +495,7 @@ public:
 	}
 
 	void SavePPM(const string &fileName) {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		// Update pixels
 		UpdateScreenBufferImpl();
@@ -565,8 +565,8 @@ protected:
 		}
 		filterNorm = 1.f / filterNorm;
 
-		for (u_int y = static_cast<u_int>(max<int>(y0, 0)); y <= static_cast<u_int>(min<int>(y1, height - 1)); ++y) {
-			for (u_int x = static_cast<u_int>(max<int>(x0, 0)); x <= static_cast<u_int>(min<int>(x1, width - 1)); ++x) {
+		for (unsigned int y = static_cast<unsigned int>(max<int>(y0, 0)); y <= static_cast<unsigned int>(min<int>(y1, height - 1)); ++y) {
+			for (unsigned int x = static_cast<unsigned int>(max<int>(x0, 0)); x <= static_cast<unsigned int>(min<int>(x1, width - 1)); ++x) {
 				const int offset = ify[y - y0] * FILTER_TABLE_SIZE + ifx[x - x0];
 				const float filterWt = filterTable[offset] * filterNorm;
 				SplatRadiance(sampleElem->radiance, x, y, filterWt);
@@ -592,7 +592,7 @@ protected:
 		}
 	}
 
-	boost::mutex radianceMutex;
+	//boost::mutex radianceMutex;
 	GaussianFilter filter2x2, filter4x4;
 	float *filterTable2x2, *filterTable4x4;
 	Spectrum *pixelsRadiance;
@@ -613,7 +613,7 @@ public:
 	}
 
 	void SplatSampleBuffer(const SampleBuffer *sampleBuffer) {
-		boost::mutex::scoped_lock lock(radianceMutex);
+		//boost::mutex::scoped_lock lock(radianceMutex);
 
 		const SampleBufferElem *sbe = sampleBuffer->GetSampleBuffer();
 		if (useLargeFilter) {
@@ -643,8 +643,8 @@ private:
 		if (x1 < x0 || y1 < y0 || x1 < 0 || y1 < 0)
 			return;
 
-		for (u_int y = static_cast<u_int>(max<int>(y0, 0)); y <= static_cast<u_int>(min<int>(y1, height - 1)); ++y)
-			for (u_int x = static_cast<u_int>(max<int>(x0, 0)); x <= static_cast<u_int>(min<int>(x1, width - 1)); ++x)
+		for (unsigned int y = static_cast<unsigned int>(max<int>(y0, 0)); y <= static_cast<unsigned int>(min<int>(y1, height - 1)); ++y)
+			for (unsigned int x = static_cast<unsigned int>(max<int>(x0, 0)); x <= static_cast<unsigned int>(min<int>(x1, width - 1)); ++x)
 				SplatRadiance(sampleElem->radiance, x, y, 0.01f);
 	}
 };

@@ -28,7 +28,7 @@
 #include <fstream>
 #include <iostream>
 
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__EMSCRIPTEN__)
 #include <stddef.h>
 #include <sys/time.h>
 #elif defined (WIN32)
@@ -40,6 +40,10 @@
 #define __CL_ENABLE_EXCEPTIONS
 #define __NO_STD_VECTOR
 #define __NO_STD_STRING
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
 
 #if defined(__APPLE__)
 #include <OpenCL/cl.hpp>
@@ -69,6 +73,8 @@ inline double WallClockTime() {
 	return t.tv_sec + t.tv_usec / 1000000.0;
 #elif defined (WIN32)
 	return GetTickCount() / 1000.0;
+#elif defined (__EMSCRIPTEN__)
+	return (emscripten_get_now() / 1000.0);	
 #else
 	Unsupported Platform !!!
 #endif

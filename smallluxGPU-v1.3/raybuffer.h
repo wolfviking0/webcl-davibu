@@ -23,9 +23,11 @@
 #ifndef _RAYBUFFER_H
 #define	_RAYBUFFER_H
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
+//#include <boost/thread/mutex.hpp>
+//#include <boost/thread/condition_variable.hpp>
 
+#include <vector>
+#include <deque>
 #include "ray.h"
 
 class PathIntegrator;
@@ -136,33 +138,33 @@ public:
 	}
 
 	void Clear() {
-		boost::unique_lock<boost::mutex> lock(queueMutex);
+		//boost::unique_lock<boost::mutex> lock(queueMutex);
 
 		queue.clear();
 	}
 
 	size_t Size() {
-		boost::unique_lock<boost::mutex> lock(queueMutex);
+		//boost::unique_lock<boost::mutex> lock(queueMutex);
 
 		return queue.size();
 	}
 
 	void Push(RayBuffer *rayBuffer) {
 		{
-			boost::unique_lock<boost::mutex> lock(queueMutex);
+			//boost::unique_lock<boost::mutex> lock(queueMutex);
 			queue.push_back(rayBuffer);
 		}
 
-		condition.notify_all();
+		//condition.notify_all();
 	}
 
 	RayBuffer *Pop() {
-		boost::unique_lock<boost::mutex> lock(queueMutex);
+		//boost::unique_lock<boost::mutex> lock(queueMutex);
 
-		while (queue.size() < 1) {
+		//while (queue.size() < 1) {
 			// Wait for a new buffer to arrive
-			condition.wait(lock);
-		}
+			//condition.wait(lock);
+		//}
 
 		RayBuffer *rayBuffer = queue.front();
 		queue.pop_front();
@@ -170,8 +172,8 @@ public:
 	}
 
 private:
-	boost::mutex queueMutex;
-	boost::condition_variable condition;
+	//boost::mutex queueMutex;
+	//boost::condition_variable condition;
 
 	std::deque<RayBuffer *> queue;
 };

@@ -109,6 +109,53 @@ smallptgpuv2_sample:
 	--preload-file scenes/simple.scn \
 	-o ../build/$(PREFIX)dav_smallptgpuv2.js
 
+smallluxgpu_sample:
+	$(call chdir,smallluxGPU-v1.3/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+		displayfunc.cpp \
+		intersectiondevice.cpp \
+		mesh.cpp \
+		path.cpp \
+		qbvhaccel.cpp \
+		renderthread.cpp \
+		scene.cpp \
+		smallluxGPU.cpp \
+		core/bbox.cpp \
+		core/matrix4x4.cpp \
+		core/transform.cpp \
+		plymesh/rply.cpp \
+		-I$(EMSCRIPTEN)/system/include -I./core -I./plymesh \
+	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 -s TOTAL_MEMORY=1024*1024*50 \
+	--preload-file qbvh_kernel.cl \
+	--preload-file render.cfg \	
+	--preload-file scenes/luxball.ply \
+	--preload-file scenes/simple-lights.ply \
+	--preload-file scenes/simple.ply \
+	--preload-file scenes/sponza-lights.ply \
+	--preload-file scenes/sponza.ply \
+	--preload-file scenes/bigmonkey-lights.ply \
+	--preload-file scenes/bigmonkey.ply \
+	--preload-file scenes/bigmonkey.scn \
+	--preload-file scenes/bulletphysics-lights.ply \
+	--preload-file scenes/bulletphysics.ply \
+	--preload-file scenes/bulletphysics.scn \
+	--preload-file scenes/interp-lights.ply \
+	--preload-file scenes/interp.ply \
+	--preload-file scenes/interp.scn \
+	--preload-file scenes/kitchen_night.scn \
+	--preload-file scenes/kitchen-lights_night.ply \
+	--preload-file scenes/kitchen-lights.ply \
+	--preload-file scenes/kitchen.ply \
+	--preload-file scenes/kitchen.scn \
+	--preload-file scenes/loft-lights.ply \
+	--preload-file scenes/loft.ply \
+	--preload-file scenes/loft.scn \
+	--preload-file scenes/luxball-lights.ply \
+	--preload-file scenes/luxball.scn \
+	--preload-file scenes/simple.scn \
+	--preload-file scenes/sponza.scn \
+	-o ../build/$(PREFIX)dav_smallptgpuv2.js
+
 clean:
 	$(call chdir,build/)
 	mkdir tmp
