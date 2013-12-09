@@ -16,12 +16,10 @@ DEB=0
 VAL=0
 
 ifeq ($(VAL),1)
-PRELOAD = --preload-file-validator
-PREFIX = "val_"
+PREFIX = val_
 $(info ************  Mode VALIDATOR : Enabled ************)
 else
-PRELOAD = --preload-file
-PREFIX = ""
+PREFIX = 
 $(info ************  Mode VALIDATOR : Disabled ************)
 endif
 
