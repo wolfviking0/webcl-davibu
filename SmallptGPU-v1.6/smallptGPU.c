@@ -59,7 +59,7 @@ static cl_command_queue commandQueue;
 static cl_program program;
 static cl_kernel kernel;
 static unsigned int workGroupSize = 1;
-static char *kernelFileName = "rendering_kernel.cl";
+static char *kernelFileName = "preprocessed_rendering_kernel_dl.cl";
 
 static Vec *colors;
 static unsigned int *seeds;
@@ -271,7 +271,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		char *stype;
@@ -310,7 +310,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		fprintf(stderr, "OpenCL Device %d: Name = %s\n", i, buf);
@@ -323,7 +323,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		fprintf(stderr, "OpenCL Device %d: Compute units = %u\n", i, units);
@@ -336,7 +336,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		fprintf(stderr, "OpenCL Device %d: Max. work group size = %d\n", i, (unsigned int)gsize);
@@ -391,7 +391,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		char *stype;
@@ -422,7 +422,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		fprintf(stderr, "[SELECTED] OpenCL Device %d: Name = %s\n", i, buf);
@@ -435,7 +435,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		fprintf(stderr, "[SELECTED] OpenCL Device %d: Compute units = %u\n", i, units);
@@ -448,7 +448,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		fprintf(stderr, "[SELECTED] OpenCL Device %d: Max. work group size = %d\n", i, (unsigned int)gsize);
@@ -545,7 +545,7 @@ static void SetUpOpenCL() {
 #ifdef __APPLE__
 	status = clBuildProgram(program, 1, devices, "-I. -D__APPLE__", NULL, NULL);
 #else
-	status = clBuildProgram(program, 1, devices, "-I. ", NULL, NULL);
+	status = clBuildProgram(program, 1, devices, "", NULL, NULL);
 #endif
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "Failed to build OpenCL kernel: %d\n", status);

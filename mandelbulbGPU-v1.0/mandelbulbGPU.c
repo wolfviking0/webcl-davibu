@@ -53,7 +53,7 @@ static cl_command_queue commandQueue;
 static cl_program program;
 static cl_kernel kernel;
 static unsigned int workGroupSize = 1;
-static char *kernelFileName = "rendering_kernel.cl";
+static char *kernelFileName = "preprocessed_rendering_kernel.cl";
 
 static void FreeBuffers() {
 	cl_int status = clReleaseMemObject(pixelBuffer);
@@ -254,7 +254,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		char *stype;
@@ -285,7 +285,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		fprintf(stderr, "OpenCL Device %d: Name = %s\n", i, buf);
@@ -311,7 +311,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		fprintf(stderr, "OpenCL Device %d: Max. work group size = %d\n", i, (unsigned int)gsize);
@@ -347,7 +347,7 @@ static void SetUpOpenCL() {
 		exit(-1);
     }
 
-	status = clBuildProgram(program, 1, devices, "-I.", NULL, NULL);
+	status = clBuildProgram(program, 1, devices, "", NULL, NULL);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "Failed to build OpenCL kernel: %d\n", status);
 
@@ -491,12 +491,15 @@ static void ExecuteKernel() {
 					}
 
 					/* Wait for the kernel call to finish execution */
+					clFinish(commandQueue);
+					/*
 					status = clWaitForEvents(1, &event);
 					if (status != CL_SUCCESS) {
 						fprintf(stderr, "Failed to wait the end of OpenCL execution: %d\n", status);
 						exit(-1);
 					}
 					clReleaseEvent(event);
+					*/
 				} else {
 					SetEnableAccumulationKernelArg(1, sampleX, sampleY);
 
@@ -535,12 +538,15 @@ static void ExecuteKernel() {
 		}
 
 		/* Wait for the kernel call to finish execution */
+		clFinish(commandQueue);
+		/*		
 		status = clWaitForEvents(1, &event);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to wait the end of OpenCL execution: %d\n", status);
 			exit(-1);
 		}
 		clReleaseEvent(event);
+		*/
 	}
 }
 
@@ -592,13 +598,15 @@ void UpdateRendering() {
 	}
 
 	/* Wait for read buffer to finish execution */
+	clFinish(commandQueue);
+	/*
 	status = clWaitForEvents(1, &event);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "Failed to wait the read of OpenCL pixel buffer: %d\n", status);
 		exit(-1);
 	}
 	clReleaseEvent(event);
-
+	*/
 	if (!config.actvateFastRendering && (config.superSamplingSize > 1)) {
 		// I have to normalize values. I could do this with a GPU kernel too.
 		unsigned int i;
@@ -643,12 +651,15 @@ void ReInit(const int reallocBuffers) {
 		}
 
 		/* Wait for read buffer to finish execution */
+		clFinish(commandQueue);
+		/*
 		status = clWaitForEvents(1, &event);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to wait the read of OpenCL camera buffer: %d\n", status);
 			exit(-1);
 		}
 		clReleaseEvent(event);
+		*/
 	}
 
 }
@@ -657,8 +668,8 @@ int main(int argc, char *argv[]) {
 	fprintf(stderr, "Usage: %s\n", argv[0]);
 	fprintf(stderr, "Usage: %s <use CPU device (0 or 1)> <use GPU device (0 or 1)> <kernel file name> <window width> <window height>\n", argv[0]);
 
-	config.width = 640;
-	config.height = 480;
+	config.width = 512;
+	config.height = 512;
 	config.enableShadow = 1;
 	config.superSamplingSize = 2;
 

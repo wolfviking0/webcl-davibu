@@ -178,10 +178,10 @@ static void PrintHelp() {
 
 void displayFunc(void) {
 	UpdateMandel();
+	
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	#ifndef __EMSCRIPTEN__
-		glClear(GL_COLOR_BUFFER_BIT);
-
 		glRasterPos2i(0, 0);
 		glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
     #else

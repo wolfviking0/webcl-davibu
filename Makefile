@@ -44,7 +44,7 @@ $(info )
 #----------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------#		
 
-all: mandelgpu_sample juliagpu_sample
+all: mandelgpu_sample juliagpu_sample mandelbulbgpu_sample smallptgpuv1_sample smallptgpuv2_sample
 
 mandelgpu_sample:
 	$(call chdir,MandelGPU-v1.3/)
@@ -57,13 +57,56 @@ mandelgpu_sample:
 	-o ../build/$(PREFIX)dav_mandelgpu.js
 
 juliagpu_sample:
+	$(call chdir,mandelbulbGPU-v1.0/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+		mandelbulbGPU.c \
+		displayfunc.c \
+	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
+	--preload-file preprocessed_rendering_kernel.cl \
+	-o ../build/$(PREFIX)dav_juliagpu.js
+
+mandelbulbgpu_sample:
 	$(call chdir,JuliaGPU-v1.2/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
 		juliaGPU.c \
 		displayfunc.c \
 	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
 	--preload-file preprocessed_rendering_kernel.cl \
-	-o ../build/$(PREFIX)dav_juliagpu.js
+	-o ../build/$(PREFIX)dav_mandelbulbgpu.js
+
+smallptgpuv1_sample:
+	$(call chdir,smallptGPU-v1.6/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+		smallptGPU.c \
+		displayfunc.c \
+	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
+	--preload-file preprocessed_rendering_kernel.cl \
+	--preload-file preprocessed_rendering_kernel_dl.cl \
+	--preload-file scene_build_complex.pl \
+	--preload-file scenes/caustic.scn \
+	--preload-file scenes/caustic3.scn \
+	--preload-file scenes/complex.scn \
+	--preload-file scenes/cornell_large.scn \
+	--preload-file scenes/cornell.scn \
+	--preload-file scenes/simple.scn \
+	-o ../build/$(PREFIX)dav_smallptgpuv1.js
+
+smallptgpuv2_sample:
+	$(call chdir,SmallptGPU-v2.0/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+		renderconfig.cpp \
+		displayfunc.cpp \
+		renderdevice.cpp \
+	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
+	--preload-file rendering_kernel.cl \
+	--preload-file scene_build_complex.pl \
+	--preload-file scenes/caustic.scn \
+	--preload-file scenes/caustic3.scn \
+	--preload-file scenes/complex.scn \
+	--preload-file scenes/cornell_large.scn \
+	--preload-file scenes/cornell.scn \
+	--preload-file scenes/simple.scn \
+	-o ../build/$(PREFIX)dav_smallptgpuv2.js
 
 clean:
 	$(call chdir,build/)
