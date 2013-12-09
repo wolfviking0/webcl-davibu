@@ -233,7 +233,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		char *stype;
@@ -264,7 +264,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		fprintf(stderr, "OpenCL Device %d: Name = %s\n", i, buf);
@@ -277,7 +277,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		fprintf(stderr, "OpenCL Device %d: Compute units = %u\n", i, units);
@@ -290,7 +290,7 @@ static void SetUpOpenCL() {
 				NULL);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to get OpenCL device info: %d\n", status);
-			exit(-1);
+			//exit(-1);
 		}
 
 		fprintf(stderr, "OpenCL Device %d: Max. work group size = %u\n", i, (unsigned int)gsize);
@@ -480,13 +480,15 @@ void UpdateMandel() {
 	}
 
 	// Wait for the kernel call to finish execution
+	clFinish(commandQueue);
+	/*
 	status = clWaitForEvents(1, &events[0]);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "Failed to wait the end of OpenCL execution: %d\n", status);
 		exit(-1);
 	}
 	clReleaseEvent(events[0]);
-
+	*/
 	// Enqueue readBuffer
 	status = clEnqueueReadBuffer(
 			commandQueue,

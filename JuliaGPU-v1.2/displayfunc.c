@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(__linux__) || defined(__MACOSX)
+#if defined(__linux__) || defined(__MACOSX) || defined(__EMSCRIPTEN__)
 #include <sys/time.h>
 #elif defined (WIN32)
 #include <windows.h>
@@ -59,17 +59,101 @@ double WallClockTime() {
 	return t.tv_sec + t.tv_usec / 1000000.0;
 #elif defined (WIN32)
 	return GetTickCount() / 1000.0;
+#elif defined (__EMSCRIPTEN__)
+	return (emscripten_get_now() / 1000.0);	
 #else
 	Unsupported Platform !!!
 #endif
 }
 
+#ifdef __EMSCRIPTEN__
+	#define glRasterPos2i(x,y)
+	#define glRecti(x,y,z,w)
+#endif
+
+#define MU_RECT_SIZE 128
+
+static unsigned int TextureIds[3];
+static unsigned int TextureTarget = GL_TEXTURE_2D;
+static unsigned int TextureInternal             = GL_RGB;
+static unsigned int TextureInternal2            = GL_RGBA;
+static unsigned int TextureFormat               = GL_RGB;
+static unsigned int TextureFormat2              = GL_RGBA;
+static unsigned int TextureType                 = GL_FLOAT;
+static unsigned int ActiveTextureUnit           = GL_TEXTURE1_ARB;
+static size_t TextureTypeSize                   = sizeof(float);
+
+static float VertexPos[4][2]            = { { -1.0f, -1.0f },
+                                            { +1.0f, -1.0f },
+                                            { +1.0f, +1.0f },
+                                            { -1.0f, +1.0f } };
+static float TexCoords[4][2];
+
+static void CreateTexture(unsigned int width, unsigned int height)
+{    
+    
+    printf("Creating Texture 1 %d x %d...\n", width, height);
+  	printf("Creating Texture 2 %d x %d...\n", MU_RECT_SIZE, MU_RECT_SIZE);
+	printf("Creating Texture 3 %d x %d...\n", MU_RECT_SIZE, MU_RECT_SIZE);
+
+    glActiveTexture(ActiveTextureUnit);
+    glGenTextures( 3, TextureIds );
+
+    for (int i = 0; i < 3; i++) {
+    	
+    	glBindTexture(TextureTarget, TextureIds[i]);
+    	glTexParameteri(TextureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    	glTexParameteri(TextureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    	if (i==0)
+    		glTexImage2D(TextureTarget, 0, TextureInternal, width, height, 0, TextureFormat, TextureType, 0);
+    	else
+    		glTexImage2D(TextureTarget, 0, TextureInternal2, MU_RECT_SIZE, MU_RECT_SIZE, 0, TextureFormat2, TextureType, 0);
+    	glBindTexture(TextureTarget, 0);
+	}
+}
+
+static int SetupGraphics(unsigned int width, unsigned int height)
+{
+    CreateTexture(width, height);
+
+    glClearColor (0.0, 0.0, 0.0, 0.0);
+
+    glDisable(GL_DEPTH_TEST);
+    glActiveTexture(GL_TEXTURE0);
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    TexCoords[3][0] = 0.0f;
+    TexCoords[3][1] = 0.0f;
+    TexCoords[2][0] = width;
+    TexCoords[2][1] = 0.0f;
+    TexCoords[1][0] = width;
+    TexCoords[1][1] = height;
+    TexCoords[0][0] = 0.0f;
+    TexCoords[0][1] = height;
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 0, VertexPos);
+    glClientActiveTexture(GL_TEXTURE0);
+    glTexCoordPointer(2, GL_FLOAT, 0, TexCoords);
+    return GL_NO_ERROR;
+}
+
+
 static void PrintString(void *font, const char *string) {
 	int len, i;
 
+#ifdef __EMSCRIPTEN__
+	printf("%s\n",string);
+#else
 	len = (int)strlen(string);
 	for (i = 0; i < len; i++)
 		glutBitmapCharacter(font, string[i]);
+#endif
 }
 
 static void PrintHelp() {
@@ -124,8 +208,7 @@ void UpdateCamera() {
 	vsmul(config.camera.y, .5135f, config.camera.y);
 }
 
-#define MU_RECT_SIZE 80
-static void DrawJulia(const int origX, const int origY, const float cR, const float cI) {
+static void DrawJulia(const int origX, const int origY, const float cR, const float cI, int id) {
 	float buffer[MU_RECT_SIZE][MU_RECT_SIZE][4];
 	const float invSize = 3.f / MU_RECT_SIZE;
 	int i, j;
@@ -154,16 +237,59 @@ static void DrawJulia(const int origX, const int origY, const float cR, const fl
 		}
 	}
 
-	glRasterPos2i(origX, origY);
-	glDrawPixels(MU_RECT_SIZE, MU_RECT_SIZE, GL_RGBA, GL_FLOAT, buffer);
+	#ifndef __EMSCRIPTEN__
+		glRasterPos2i(origX, origY);
+		glDrawPixels(MU_RECT_SIZE, MU_RECT_SIZE, GL_RGBA, GL_FLOAT, buffer);
+	#else
+	 	glEnable( TextureTarget );
+	    glBindTexture( TextureTarget, TextureIds[id] );
+
+	    if(buffer) {
+	        glTexSubImage2D(TextureTarget, 0, 0, 0, MU_RECT_SIZE, MU_RECT_SIZE, TextureFormat2, TextureType, buffer);
+	    }
+
+	  	glBegin(GL_TRIANGLE_STRIP);
+	    glTexCoord2i( 0, 0 ); glVertex3f( origX, origY, 0 );
+	    glTexCoord2i( 0, 1 ); glVertex3f( origX, origY+MU_RECT_SIZE, 0 );
+	    glTexCoord2i( 1, 0 ); glVertex3f( origX+MU_RECT_SIZE, origY, 0 );
+	    glTexCoord2i( 1, 1 ); glVertex3f( origX+MU_RECT_SIZE,origY+MU_RECT_SIZE, 0 );
+	    glEnd();
+
+	    glDisable( TextureTarget );
+	    glBindTexture( TextureTarget, 0 );
+	#endif	
 }
 
 void displayFunc(void) {
 	UpdateRendering();
 
 	glClear(GL_COLOR_BUFFER_BIT);
-	glRasterPos2i(0, 0);
-	glDrawPixels(config.width, config.height, GL_RGB, GL_FLOAT, pixels);
+
+	#ifndef __EMSCRIPTEN__
+		glRasterPos2i(0, 0);
+		glDrawPixels(config.width, config.height, GL_RGB, GL_FLOAT, pixels);
+	#else
+	 	glEnable( TextureTarget );
+	    glBindTexture( TextureTarget, TextureIds[0] );
+
+	    if(pixels) {
+	        glTexSubImage2D(TextureTarget, 0, 0, 0,  config.width, config.height, TextureFormat, TextureType, pixels);
+	    }
+
+		glBegin(GL_TRIANGLE_STRIP);
+		glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 0, 0 ); glVertex3f( 0, 0, 0 );
+	    glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 0, 1 ); glVertex3f( 0, config.height, 0 );
+	    glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 1, 0 ); glVertex3f( config.width, 0, 0 );
+	    glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 1, 1 ); glVertex3f( config.width, config.height, 0 );
+	    glEnd();
+
+	    glDisable( TextureTarget );
+	    glBindTexture( TextureTarget, 0 );
+	#endif
 
 	// Caption line 0
 	glColor3f(1.f, 1.f, 1.f);
@@ -193,10 +319,10 @@ void displayFunc(void) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	const int baseMu1 = config.width - MU_RECT_SIZE - 2;
 	const int baseMu2 = 1;
-	DrawJulia(baseMu1, baseMu2, config.mu[0], config.mu[1]);
+	DrawJulia(baseMu1, baseMu2, config.mu[0], config.mu[1] ,1);
 	const int baseMu3 = config.width - MU_RECT_SIZE - 2;
 	const int baseMu4 = MU_RECT_SIZE + 2;
-	DrawJulia(baseMu3, baseMu4, config.mu[2], config.mu[3]);
+	DrawJulia(baseMu3, baseMu4, config.mu[2], config.mu[3] ,2);
 	glDisable(GL_BLEND);
 
 	glColor3f(1.f, 1.f, 1.f);
@@ -575,6 +701,8 @@ void InitGlut(int argc, char *argv[], char *windowTittle) {
 
 	glutCreateWindow(windowTittle);
 
+	SetupGraphics(config.width, config.height);
+
     glutReshapeFunc(reshapeFunc);
     glutKeyboardFunc(keyFunc);
     glutSpecialFunc(specialFunc);
@@ -584,4 +712,5 @@ void InitGlut(int argc, char *argv[], char *windowTittle) {
 	glutTimerFunc(1000, timerFunc, 0);
 
 	glMatrixMode(GL_PROJECTION);
+
 }

@@ -68,7 +68,7 @@ void UpdateMandel() {
 			float x2 = x * x;
 			float y2 = y * y;
 
-			uint iter = 0;
+			unsigned int iter = 0;
 			for (iter = 0; (x2 + y2 <= 4.f) && (iter < maxIterations); ++iter) {
 				y = 2 * x * y + y0;
 				x = x2 - y2 + x0;

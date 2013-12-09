@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(__linux__) || defined(__MACOSX)
+#if defined(__linux__) || defined(__MACOSX) || defined(__EMSCRIPTEN__)
 #include <sys/time.h>
 #elif defined (WIN32)
 #include <windows.h>
@@ -41,8 +41,8 @@ extern void UpdateMandel();
 
 int amiMandelCPU;
 
-int width = 640;
-int height = 480;
+int width = 512;
+int height = 512;
 float scale = 3.5f;
 float offsetX = -0.5f;
 float offsetY = 0.0f;
@@ -61,17 +61,91 @@ double WallClockTime() {
 	return t.tv_sec + t.tv_usec / 1000000.0;
 #elif defined (WIN32)
 	return GetTickCount() / 1000.0;
+#elif defined (__EMSCRIPTEN__)
+	return (emscripten_get_now() / 1000.0);	
 #else
 	Unsupported Platform !!!
 #endif
 }
 
+#ifdef __EMSCRIPTEN__
+	#define glRasterPos2i(x,y)
+	#define glRecti(x,y,z,w)
+#endif
+
+unsigned int TextureId;
+static unsigned int TextureTarget = GL_TEXTURE_2D;
+static unsigned int TextureInternal             = GL_LUMINANCE;
+static unsigned int TextureFormat               = GL_LUMINANCE;
+static unsigned int TextureType                 = GL_UNSIGNED_BYTE;
+static unsigned int ActiveTextureUnit           = GL_TEXTURE1_ARB;
+static size_t TextureTypeSize                   = sizeof(float);
+
+static float VertexPos[4][2]            = { { -1.0f, -1.0f },
+                                            { +1.0f, -1.0f },
+                                            { +1.0f, +1.0f },
+                                            { -1.0f, +1.0f } };
+static float TexCoords[4][2];
+
+static void CreateTexture(unsigned int width, unsigned int height)
+{    
+    
+    printf("Creating Texture 1 %d x %d...\n", width, height);
+
+    glActiveTexture(ActiveTextureUnit);
+    
+    glGenTextures( 1, &TextureId );
+	glBindTexture(TextureTarget, TextureId);
+
+    glTexParameteri(TextureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(TextureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glTexImage2D(TextureTarget, 0, TextureInternal, width, height, 0, TextureFormat, TextureType, 0);
+    glBindTexture(TextureTarget, 0);
+
+}
+
+static int SetupGraphics(unsigned int width, unsigned int height)
+{
+    CreateTexture(width,height);
+
+    glClearColor (0.0, 0.0, 0.0, 0.0);
+
+    glDisable(GL_DEPTH_TEST);
+    glActiveTexture(GL_TEXTURE0);
+    glViewport(0, 0,width,height);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    TexCoords[3][0] = 0.0f;
+    TexCoords[3][1] = 0.0f;
+    TexCoords[2][0] = width;
+    TexCoords[2][1] = 0.0f;
+    TexCoords[1][0] = width;
+    TexCoords[1][1] = height;
+    TexCoords[0][0] = 0.0f;
+    TexCoords[0][1] = height;
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 0, VertexPos);
+    glClientActiveTexture(GL_TEXTURE0);
+    glTexCoordPointer(2, GL_FLOAT, 0, TexCoords);
+    return GL_NO_ERROR;
+}
+
 static void PrintString(void *font, const char *string) {
+	#ifdef __EMSCRIPTEN__
+		printf("%s\n",string);
+	#else
 	int len, i;
 
 	len = (int)strlen(string);
 	for (i = 0; i < len; i++)
 		glutBitmapCharacter(font, string[i]);
+	#endif
 }
 
 static void PrintHelp() {
@@ -105,9 +179,35 @@ static void PrintHelp() {
 void displayFunc(void) {
 	UpdateMandel();
 
-	glClear(GL_COLOR_BUFFER_BIT);
-	glRasterPos2i(0, 0);
-	glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
+	#ifndef __EMSCRIPTEN__
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		glRasterPos2i(0, 0);
+		glDrawPixels(width, height, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
+    #else
+	
+	 	glEnable( TextureTarget );
+	    glBindTexture( TextureTarget, TextureId );
+
+	    if(pixels) {
+	        glTexSubImage2D(TextureTarget, 0, 0, 0,  width, height, TextureFormat, TextureType, pixels);
+	    }
+
+		glBegin(GL_TRIANGLE_STRIP);
+		glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 0, 0 ); glVertex3f( 0, 0, 0 );
+	    glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 0, 1 ); glVertex3f( 0, height, 0 );
+	    glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 1, 0 ); glVertex3f( width, 0, 0 );
+	    glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 1, 1 ); glVertex3f( width, height, 0 );
+	    glEnd();
+
+	    glDisable( TextureTarget );
+	    glBindTexture( TextureTarget, 0 );
+	    
+	 #endif
 
 	// Title
 	glColor3f(1.f, 1.f, 1.f);
@@ -301,6 +401,8 @@ void InitGlut(int argc, char *argv[], char *windowTittle) {
 
 	glutCreateWindow(windowTittle);
 
+	SetupGraphics(width, height);
+
 	glutReshapeFunc(reshapeFunc);
 	glutKeyboardFunc(keyFunc);
 	glutSpecialFunc(specialFunc);
@@ -309,4 +411,6 @@ void InitGlut(int argc, char *argv[], char *windowTittle) {
 	glutMotionFunc(motionFunc);
 
 	glMatrixMode(GL_PROJECTION);
+
+	
 }

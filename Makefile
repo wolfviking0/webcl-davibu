@@ -44,7 +44,26 @@ $(info )
 #----------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------#		
 
-all: 
+all: mandelgpu_sample juliagpu_sample
+
+mandelgpu_sample:
+	$(call chdir,MandelGPU-v1.3/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+		mandelGPU.c \
+		displayfunc.c \
+	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
+	--preload-file rendering_kernel_float4.cl \
+	--preload-file rendering_kernel.cl \
+	-o ../build/$(PREFIX)dav_mandelgpu.js
+
+juliagpu_sample:
+	$(call chdir,JuliaGPU-v1.2/)
+	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+		juliaGPU.c \
+		displayfunc.c \
+	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
+	--preload-file preprocessed_rendering_kernel.cl \
+	-o ../build/$(PREFIX)dav_juliagpu.js
 
 clean:
 	$(call chdir,build/)
