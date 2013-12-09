@@ -27,12 +27,12 @@
 
 RenderDevice::RenderDevice(const cl::Device &device, const string &kernelFileName,
 		const unsigned int forceGPUWorkSize,
-		Camera *camera, Sphere *spheres, const unsigned int sceneSphereCount,
-		boost::barrier *startBarrier, boost::barrier *endBarrier) :
-	renderThread(NULL), threadStartBarrier(startBarrier), threadEndBarrier(endBarrier),
+		Camera *camera, Sphere *spheres, const unsigned int sceneSphereCount/*,
+		boost::barrier *startBarrier, boost::barrier *endBarrier*/) :
+	/*renderThread(NULL), threadStartBarrier(startBarrier), threadEndBarrier(endBarrier),*/
 	sphereCount(sceneSphereCount), colorBuffer(NULL), pixelBuffer(NULL), seedBuffer(NULL),
 	pixels(NULL), colors(NULL), seeds(NULL), exeUnitCount(0.0), exeTime(0.0) {
-	deviceName = device.getInfo<CL_DEVICE_NAME > ().c_str();
+	deviceName = "anonymouse";//device.getInfo<CL_DEVICE_NAME > ().c_str();
 
 	// Allocate a context with the selected device
 	cl::Platform platform = device.getInfo<CL_DEVICE_PLATFORM>();
@@ -56,7 +56,9 @@ RenderDevice::RenderDevice(const cl::Device &device, const string &kernelFileNam
 	try {
 		VECTOR_CLASS<cl::Device> buildDevice;
 		buildDevice.push_back(device);
-#if defined(__APPLE__)
+#if defined(__EMSCRIPTEN__)
+		program.build(buildDevice, "");
+#elif defined(__APPLE__)
 		program.build(buildDevice, "-I. -D__APPLE__");
 #else
 		program.build(buildDevice, "-I.");
@@ -82,7 +84,7 @@ RenderDevice::RenderDevice(const cl::Device &device, const string &kernelFileNam
 	}
 
 	// Create the thread for the rendering
-	renderThread = new boost::thread(boost::bind(RenderDevice::RenderThread, this));
+	//renderThread = new boost::thread(boost::bind(RenderDevice::RenderThread, this));
 
 	// Create camera buffer
 	cameraBuffer = new cl::Buffer(*context,
@@ -107,13 +109,14 @@ RenderDevice::RenderDevice(const cl::Device &device, const string &kernelFileNam
 }
 
 RenderDevice::~RenderDevice() {
+	/*
 	if (renderThread) {
 		renderThread->interrupt();
 		renderThread->join();
 
 		delete renderThread;
 	}
-
+	*/
 	delete queue;
 	delete kernel;
 
@@ -136,8 +139,8 @@ RenderDevice::~RenderDevice() {
 
 void RenderDevice::RenderThread(RenderDevice *renderDevice) {
 	try {
-		for (;;) {
-			renderDevice->threadStartBarrier->wait();
+		//for (;;) {
+		//	renderDevice->threadStartBarrier->wait();
 
 			renderDevice->SetKernelArgs();
 			renderDevice->ExecuteKernel();
@@ -145,10 +148,10 @@ void RenderDevice::RenderThread(RenderDevice *renderDevice) {
 			renderDevice->FinishExecuteKernel();
 			renderDevice->Finish();
 
-			renderDevice->threadEndBarrier->wait();
-		}
-	} catch (boost::thread_interrupted) {
-		cerr << "[Device::" << renderDevice->GetName() << "] Rendering thread halted" << endl;
+		//	renderDevice->threadEndBarrier->wait();
+		//}
+	//} catch (boost::thread_interrupted) {
+	//	cerr << "[Device::" << renderDevice->GetName() << "] Rendering thread halted" << endl;
 	} catch (cl::Error err) {
 		cerr << "[Device::" << renderDevice->GetName() << "] ERROR: " << err.what() << "(" << err.err() << ")" << endl;
 	}

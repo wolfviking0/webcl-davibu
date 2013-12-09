@@ -38,8 +38,8 @@
 #include <CL/cl.hpp>
 #endif
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/barrier.hpp>
+//#include <boost/thread/thread.hpp>
+//#include <boost/thread/barrier.hpp>
 
 #include "camera.h"
 #include "geom.h"
@@ -51,8 +51,8 @@ public:
 	RenderDevice(const cl::Device &dev, const string &kernelFileName,
 			const unsigned int forceGPUWorkSize,
 			Camera *camera, Sphere *spheres,
-			const unsigned int sceneSphereCount,
-			boost::barrier *startBarrier, boost::barrier *endBarrier);
+			const unsigned int sceneSphereCount/*,
+			boost::barrier *startBarrier, boost::barrier *endBarrier*/);
 	~RenderDevice();
 
 	void SetWorkLoad(const unsigned int offset, const unsigned int amount,
@@ -98,8 +98,9 @@ public:
 	unsigned int GetWorkOffset() const { return workOffset; }
 	size_t GetWorkAmount() const { return workAmount; }
 
-private:
 	static void RenderThread(RenderDevice *renderDevice);
+
+private:
 
 	string ReadSources(const string &fileName);
 
@@ -141,19 +142,20 @@ private:
 	}
 
 	void FinishExecuteKernel() {
-		kernelExecutionTime.wait();
+		//kernelExecutionTime.wait();
+		queue->finish();
 
 		// Check kernel execution time
 		cl_ulong t1, t2;
-		kernelExecutionTime.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_START, &t1);
-		kernelExecutionTime.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_END, &t2);
+		//kernelExecutionTime.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_START, &t1);
+		//kernelExecutionTime.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_END, &t2);
 		exeTime += (t2 - t1) / 1e9;
 	}
 
 	string deviceName;
-	boost::thread *renderThread;
-	boost::barrier *threadStartBarrier;
-	boost::barrier *threadEndBarrier;
+	//boost::thread *renderThread;
+	//boost::barrier *threadStartBarrier;
+	//boost::barrier *threadEndBarrier;
 
 	cl::Context *context;
 	cl::CommandQueue *queue;

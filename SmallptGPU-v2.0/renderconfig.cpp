@@ -26,8 +26,8 @@
 RenderConfig::RenderConfig(const string &sceneFileName, const unsigned int w,
 		const unsigned int h, const bool useCPUs, const bool useGPUs,
 		const unsigned int forceGPUWorkSize) :
-		selectedDevice(0), width(w), height(h), currentSample(0),
-		threadStartBarrier(NULL), threadEndBarrier(NULL) {
+		selectedDevice(0), width(w), height(h), currentSample(0)/*,
+		threadStartBarrier(NULL), threadEndBarrier(NULL) */{
 	captionBuffer[0] = 0;
 	renderDevicesPerfIndex.resize(renderDevices.size(), 1.f);
 
@@ -46,11 +46,12 @@ RenderConfig::~RenderConfig() {
 	delete pixels;
 	delete camera;
 	delete spheres;
-
+	/*
 	if (threadStartBarrier)
 		delete threadStartBarrier;
 	if (threadEndBarrier)
 		delete threadEndBarrier;
+	*/
 }
 
 void RenderConfig::ReadScene(const char *fileName) {
@@ -123,7 +124,7 @@ void RenderConfig::SetUpOpenCL(const bool useCPUs, const bool useGPUs,
 	cl::Platform::get(&platforms);
 	for (size_t i = 0; i < platforms.size(); ++i)
 		cerr << "OpenCL Platform " << i << ": " <<
-			platforms[i].getInfo<CL_PLATFORM_VENDOR>().c_str() << endl;
+			/*platforms[i].getInfo<CL_PLATFORM_VENDOR>().c_str()*/"anonymous" << endl;
 
 	if (platforms.size() == 0)
 		throw runtime_error("Unable to find an appropiate OpenCL platform");
@@ -140,7 +141,7 @@ void RenderConfig::SetUpOpenCL(const bool useCPUs, const bool useGPUs,
 	for (size_t i = 0; i < devices.size(); ++i) {
 		cl_int type = devices[i].getInfo<CL_DEVICE_TYPE>();
 		cerr << "OpenCL Device name " << i << ": " <<
-				devices[i].getInfo<CL_DEVICE_NAME>().c_str() << endl;
+				/*devices[i].getInfo<CL_DEVICE_NAME>().c_str()*/"anonymous" << endl;
 
 		string stype;
 		switch (type) {
@@ -174,14 +175,14 @@ void RenderConfig::SetUpOpenCL(const bool useCPUs, const bool useGPUs,
 		throw runtime_error("Unable to find an appropiate OpenCL device");
 	else {
 		// Allocate devices
-		threadStartBarrier = new boost::barrier(selectedDevices.size() + 1);
-		threadEndBarrier = new boost::barrier(selectedDevices.size() + 1);
+		//threadStartBarrier = new boost::barrier(selectedDevices.size() + 1);
+		//threadEndBarrier = new boost::barrier(selectedDevices.size() + 1);
 
 		for (size_t i = 0; i < selectedDevices.size(); ++i) {
 			renderDevices.push_back(new RenderDevice(
 				selectedDevices[i], "rendering_kernel.cl", forceGPUWorkSize,
-				camera, spheres, sphereCount,
-				threadStartBarrier, threadEndBarrier));
+				camera, spheres, sphereCount/*,
+				threadStartBarrier, threadEndBarrier*/));
 		}
 
 		cerr << "OpenCL Device used: ";

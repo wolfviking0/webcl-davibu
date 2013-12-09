@@ -94,10 +94,11 @@ smallptgpuv1_sample:
 smallptgpuv2_sample:
 	$(call chdir,SmallptGPU-v2.0/)
 	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+		smallptGPU.cpp \
 		renderconfig.cpp \
 		displayfunc.cpp \
 		renderdevice.cpp \
-	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
+	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 -s TOTAL_MEMORY=1024*1024*50 \
 	--preload-file rendering_kernel.cl \
 	--preload-file scene_build_complex.pl \
 	--preload-file scenes/caustic.scn \

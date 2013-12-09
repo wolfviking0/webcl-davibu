@@ -43,8 +43,8 @@
 #include <CL/cl.hpp>
 #endif
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/barrier.hpp>
+//#include <boost/thread/thread.hpp>
+//#include <boost/thread/barrier.hpp>
 
 #include "camera.h"
 #include "geom.h"
@@ -219,10 +219,10 @@ private:
 			renderDevices[i]->SetArgs(currentSample);
 
 		// Start the rendering threads
-		threadStartBarrier->wait();
+		//threadStartBarrier->wait();
 
 		// Wait for job done signal (any reference to Bush is not itended...)
-		threadEndBarrier->wait();
+		//threadEndBarrier->wait();
 	}
 
 	void UpdateCamera() {
@@ -252,8 +252,8 @@ private:
 	// OpenCL fields
 	VECTOR_CLASS<RenderDevice *> renderDevices;
 	vector<double> renderDevicesPerfIndex;
-	boost::barrier *threadStartBarrier;
-	boost::barrier *threadEndBarrier;
+	//boost::barrier *threadStartBarrier;
+	//boost::barrier *threadEndBarrier;
 
 	double timeFirstWorkloadUpdate;
 	bool workLoadProfiling;

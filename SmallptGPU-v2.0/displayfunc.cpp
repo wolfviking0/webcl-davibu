@@ -34,7 +34,7 @@ static bool printHelp = true;
 static bool showWorkLoad = true;
 
 double WallClockTime() {
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__EMSCRIPTEN__)
 	struct timeval t;
 	gettimeofday(&t, NULL);
 
@@ -44,6 +44,74 @@ double WallClockTime() {
 #else
 	Unsupported Platform !!!
 #endif
+}
+
+#ifdef __EMSCRIPTEN__
+	#define glRasterPos2i(x,y)
+	#define glRecti(x,y,z,w)
+#endif
+
+unsigned int TextureId;
+static unsigned int TextureTarget = GL_TEXTURE_2D;
+static unsigned int TextureInternal             = GL_RGBA;
+static unsigned int TextureFormat               = GL_RGBA;
+static unsigned int TextureType                 = GL_UNSIGNED_BYTE;
+static unsigned int ActiveTextureUnit           = GL_TEXTURE1_ARB;
+static size_t TextureTypeSize                   = sizeof(int);
+
+static float VertexPos[4][2]            = { { -1.0f, -1.0f },
+                                            { +1.0f, -1.0f },
+                                            { +1.0f, +1.0f },
+                                            { -1.0f, +1.0f } };
+static float TexCoords[4][2];
+
+static void CreateTexture(unsigned int width, unsigned int height)
+{    
+    
+    printf("Creating Texture 1 %d x %d...\n", width, height);
+
+    glActiveTexture(ActiveTextureUnit);
+    
+    glGenTextures( 1, &TextureId );
+	glBindTexture(TextureTarget, TextureId);
+
+    glTexParameteri(TextureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(TextureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glTexImage2D(TextureTarget, 0, TextureInternal, width, height, 0, TextureFormat, TextureType, 0);
+    glBindTexture(TextureTarget, 0);
+
+}
+
+static int SetupGraphics(unsigned int width, unsigned int height)
+{
+    CreateTexture(width,height);
+
+    glClearColor (0.0, 0.0, 0.0, 0.0);
+
+    glDisable(GL_DEPTH_TEST);
+    glActiveTexture(GL_TEXTURE0);
+    glViewport(0, 0,width,height);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    TexCoords[3][0] = 0.0f;
+    TexCoords[3][1] = 0.0f;
+    TexCoords[2][0] = width;
+    TexCoords[2][1] = 0.0f;
+    TexCoords[1][0] = width;
+    TexCoords[1][1] = height;
+    TexCoords[0][0] = 0.0f;
+    TexCoords[0][1] = height;
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 0, VertexPos);
+    glClientActiveTexture(GL_TEXTURE0);
+    glTexCoordPointer(2, GL_FLOAT, 0, TexCoords);
+    return GL_NO_ERROR;
 }
 
 static double totalElapsedTime = 0.0;
@@ -67,11 +135,15 @@ static void UpdateRendering() {
 }
 
 static void PrintString(void *font, const char *string) {
+	#ifdef __EMSCRIPTEN__
+		printf("%s\n",string);
+	#else
 	int len, i;
 
 	len = (int)strlen(string);
 	for (i = 0; i < len; i++)
 		glutBitmapCharacter(font, string[i]);
+	#endif	
 }
 
 static void PrintHelpAndDevices() {
@@ -177,11 +249,38 @@ static void PrintCaptions() {
 }
 
 void displayFunc(void) {
-	glRasterPos2i(0, 0);
-	glDrawPixels(config->width, config->height, GL_RGBA, GL_UNSIGNED_BYTE, config->pixels);
+	const VECTOR_CLASS<RenderDevice *> devices = config->GetRenderDevice();
+	for (size_t i = 0; i < devices.size(); ++i) {
+		RenderDevice::RenderThread(devices[i]);
+	}
+	
+	#ifndef __EMSCRIPTEN__
+		glRasterPos2i(0, 0);
+		glDrawPixels(config->width, config->height, GL_RGBA, GL_UNSIGNED_BYTE, config->pixels);
+	#else
+	 	glEnable( TextureTarget );
+	    glBindTexture( TextureTarget, TextureId );
+
+	    if(config->pixels) {
+	        glTexSubImage2D(TextureTarget, 0, 0, 0,  config->width, config->height, TextureFormat, TextureType, config->pixels);
+	    }
+
+		glBegin(GL_TRIANGLE_STRIP);
+		glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 0, 0 ); glVertex3f( 0, 0, 0 );
+	    glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 0, 1 ); glVertex3f( 0, config->height, 0 );
+	    glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 1, 0 ); glVertex3f( config->width, 0, 0 );
+	    glColor3f( 1, 1, 1 );
+	    glTexCoord2i( 1, 1 ); glVertex3f( config->width, config->height, 0 );
+	    glEnd();
+
+	    glDisable( TextureTarget );
+	    glBindTexture( TextureTarget, 0 );
+	#endif
 
 	if (showWorkLoad) {
-		const VECTOR_CLASS<RenderDevice *> devices = config->GetRenderDevice();
 		int start = 0;
 		for (size_t i = 0; i < devices.size(); ++i) {
 			const int end = (devices[i]->GetWorkOffset() + devices[i]->GetWorkAmount()) / config->width;
@@ -468,6 +567,8 @@ void RunGlut() {
 	glutSpecialFunc(specialFunc);
 	glutDisplayFunc(displayFunc);
 	glutIdleFunc(idleFunc);
+
+	SetupGraphics(config->width, config->height);
 
 	glMatrixMode(GL_PROJECTION);
 	glViewport(0, 0, config->width, config->height);
