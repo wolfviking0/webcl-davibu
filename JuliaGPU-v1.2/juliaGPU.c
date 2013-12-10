@@ -490,15 +490,12 @@ static void ExecuteKernel() {
 					}
 
 					/* Wait for the kernel call to finish execution */
-					clFinish(commandQueue);
-					/*
 					status = clWaitForEvents(1, &event);
 					if (status != CL_SUCCESS) {
 						fprintf(stderr, "Failed to wait the end of OpenCL execution: %d\n", status);
 						exit(-1);
 					}
 					clReleaseEvent(event);
-					*/
 				} else {
 					SetEnableAccumulationKernelArg(1, sampleX, sampleY);
 
@@ -537,15 +534,12 @@ static void ExecuteKernel() {
 		}
 
 		/* Wait for the kernel call to finish execution */
-		clFinish(commandQueue);
-		/*
 		status = clWaitForEvents(1, &event);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to wait the end of OpenCL execution: %d\n", status);
 			exit(-1);
 		}
 		clReleaseEvent(event);
-		*/
 	}
 }
 
@@ -597,15 +591,13 @@ void UpdateRendering() {
 	}
 
 	/* Wait for read buffer to finish execution */
-	clFinish(commandQueue);
-	/*
 	status = clWaitForEvents(1, &event);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "Failed to wait the read of OpenCL pixel buffer: %d\n", status);
 		exit(-1);
 	}
 	clReleaseEvent(event);
-	*/
+
 	if (!config.actvateFastRendering && (config.superSamplingSize > 1)) {
 		// I have to normalize values. I could do this with a GPU kernel too.
 		unsigned int i;
@@ -650,15 +642,12 @@ void ReInit(const int reallocBuffers) {
 		}
 
 		/* Wait for read buffer to finish execution */
-		clFinish(commandQueue);
-		/*
 		status = clWaitForEvents(1, &event);
 		if (status != CL_SUCCESS) {
 			fprintf(stderr, "Failed to wait the read of OpenCL camera buffer: %d\n", status);
 			exit(-1);
 		}
 		clReleaseEvent(event);
-		*/
 	}
 
 }

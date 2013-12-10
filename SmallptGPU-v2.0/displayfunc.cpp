@@ -30,8 +30,8 @@
 
 RenderConfig *config;
 
-static bool printHelp = true;
-static bool showWorkLoad = true;
+static bool printHelp = false;
+static bool showWorkLoad = false;
 
 double WallClockTime() {
 #if defined(__linux__) || defined(__APPLE__) || defined(__EMSCRIPTEN__)

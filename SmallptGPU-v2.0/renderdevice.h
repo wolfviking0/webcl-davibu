@@ -142,13 +142,12 @@ private:
 	}
 
 	void FinishExecuteKernel() {
-		//kernelExecutionTime.wait();
-		queue->finish();
+		kernelExecutionTime.wait();
 
 		// Check kernel execution time
 		cl_ulong t1, t2;
-		//kernelExecutionTime.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_START, &t1);
-		//kernelExecutionTime.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_END, &t2);
+		kernelExecutionTime.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_START, &t1);
+		kernelExecutionTime.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_END, &t2);
 		exeTime += (t2 - t1) / 1e9;
 	}
 

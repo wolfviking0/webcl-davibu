@@ -479,16 +479,14 @@ void UpdateMandel() {
 		exit(-1);
 	}
 
-	// Wait for the kernel call to finish execution
-	clFinish(commandQueue);
-	/*
+	// Wait for the kernel call to finish execution	
 	status = clWaitForEvents(1, &events[0]);
 	if (status != CL_SUCCESS) {
 		fprintf(stderr, "Failed to wait the end of OpenCL execution: %d\n", status);
 		exit(-1);
 	}
 	clReleaseEvent(events[0]);
-	*/
+	
 	// Enqueue readBuffer
 	status = clEnqueueReadBuffer(
 			commandQueue,
