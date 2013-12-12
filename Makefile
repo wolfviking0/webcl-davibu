@@ -32,13 +32,15 @@ endif
 
 DEBUG = -O0 -s OPENCL_VALIDATOR=$(VAL) -s OPENCL_PRINT_TRACE=1 -s DISABLE_EXCEPTION_CATCHING=0 -s WARN_ON_UNDEFINED_SYMBOLS=1 -s OPENCL_PROFILE=1 -s OPENCL_DEBUG=1 -s OPENCL_GRAB_TRACE=1 -s OPENCL_CHECK_VALID_OBJECT=1
 
-NO_DEBUG = -03 -s OPENCL_VALIDATOR=$(VAL) -s WARN_ON_UNDEFINED_SYMBOLS=0 -s OPENCL_PROFILE=1 -s OPENCL_DEBUG=0 -s OPENCL_GRAB_TRACE=0 -s OPENCL_PRINT_TRACE=0 -s OPENCL_CHECK_VALID_OBJECT=0
+NO_DEBUG = -02 -s OPENCL_VALIDATOR=$(VAL) -s WARN_ON_UNDEFINED_SYMBOLS=0 -s OPENCL_PROFILE=1 -s OPENCL_DEBUG=0 -s OPENCL_GRAB_TRACE=0 -s OPENCL_PRINT_TRACE=0 -s OPENCL_CHECK_VALID_OBJECT=0
 
 ifeq ($(DEB),1)
 MODE=$(DEBUG)
+EMCCDEBUG = EMCC_DEBUG
 $(info ************  Mode DEBUG : Enabled ************)
 else
 MODE=$(NO_DEBUG)
+EMCCDEBUG = EMCCDEBUG
 $(info ************  Mode DEBUG : Disabled ************)
 endif
 
@@ -55,7 +57,7 @@ all: mandelgpu_sample juliagpu_sample mandelbulbgpu_sample smallptgpuv1_sample s
 
 mandelgpu_sample:
 	$(call chdir,MandelGPU-v1.3/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
 		mandelGPU.c \
 		displayfunc.c \
 	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
@@ -65,7 +67,7 @@ mandelgpu_sample:
 
 juliagpu_sample:
 	$(call chdir,mandelbulbGPU-v1.0/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
 		mandelbulbGPU.c \
 		displayfunc.c \
 	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
@@ -74,7 +76,7 @@ juliagpu_sample:
 
 mandelbulbgpu_sample:
 	$(call chdir,JuliaGPU-v1.2/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
 		juliaGPU.c \
 		displayfunc.c \
 	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
@@ -83,7 +85,7 @@ mandelbulbgpu_sample:
 
 smallptgpuv1_sample:
 	$(call chdir,smallptGPU-v1.6/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
 		smallptGPU.c \
 		displayfunc.c \
 	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
@@ -100,7 +102,7 @@ smallptgpuv1_sample:
 
 smallptgpuv2_sample:
 	$(call chdir,SmallptGPU-v2.0/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
 		smallptGPU.cpp \
 		renderconfig.cpp \
 		displayfunc.cpp \
@@ -118,7 +120,7 @@ smallptgpuv2_sample:
 
 smallluxgpu_sample:
 	$(call chdir,smallluxGPU-v1.3/)
-	JAVA_HEAP_SIZE=8096m EMCC_DEBUG=$(DEB) $(CXX) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
 		displayfunc.cpp \
 		intersectiondevice.cpp \
 		mesh.cpp \
