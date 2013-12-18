@@ -67,23 +67,23 @@ mandelgpu_sample:
 	--preload-file rendering_kernel.cl \
 	-o ../build/$(PREFIX)dav_mandelgpu.js
 
-juliagpu_sample:
+mandelbulbgpu_sample:
 	$(call chdir,mandelbulbGPU-v1.0/)
 	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
 		mandelbulbGPU.c \
 		displayfunc.c \
 	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
 	--preload-file preprocessed_rendering_kernel.cl \
-	-o ../build/$(PREFIX)dav_juliagpu.js
+	-o ../build/$(PREFIX)dav_mandelbulbgpu.js
 
-mandelbulbgpu_sample:
+juliagpu_sample:
 	$(call chdir,JuliaGPU-v1.2/)
 	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
 		juliaGPU.c \
 		displayfunc.c \
 	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
 	--preload-file preprocessed_rendering_kernel.cl \
-	-o ../build/$(PREFIX)dav_mandelbulbgpu.js
+	-o ../build/$(PREFIX)dav_juliagpu.js
 
 smallptgpuv1_sample:
 	$(call chdir,smallptGPU-v1.6/)
@@ -169,6 +169,7 @@ smallluxgpu_sample:
 
 clean:
 	$(call chdir,build/)
+	rm -rf tmp/	
 	mkdir tmp
 	cp memoryprofiler.js tmp/
 	cp settings.js tmp/

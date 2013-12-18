@@ -40,7 +40,7 @@ typedef struct {
 
 
 
-static float IterateIntersect(const float4 z0, const float4 c0, const uint maxIterations) {
+ float IterateIntersect(const float4 z0, const float4 c0, const uint maxIterations) {
  float4 z = z0;
  float4 c = c0;
 
@@ -68,7 +68,7 @@ static float IterateIntersect(const float4 z0, const float4 c0, const uint maxIt
  return 0.5f * log(r) * r / dr;
 }
 
-static float IntersectBulb(const float4 eyeRayOrig, const float4 eyeRayDir,
+ float IntersectBulb(const float4 eyeRayOrig, const float4 eyeRayDir,
   const float4 c, const uint maxIterations, const float epsilon,
   const float maxDist, float4 *hitPoint, uint *steps) {
  float dist;
@@ -142,7 +142,7 @@ int IntersectBoundingSphere(const float4 eyeRayOrig, const float4 eyeRayDir,
  }
 }
 
-static float4 NormEstimate(const float4 p, const float4 c,
+ float4 NormEstimate(const float4 p, const float4 c,
   const float delta, const uint maxIterations) {
  const float4 qP = p;
  const float4 gx1 = qP - (float4)(delta, 0.f, 0.f, 0.f);
@@ -164,7 +164,7 @@ static float4 NormEstimate(const float4 p, const float4 c,
  return N;
 }
 
-static float4 Phong(const float4 light, const float4 eye, const float4 pt,
+ float4 Phong(const float4 light, const float4 eye, const float4 pt,
   const float4 N, const float4 diffuse) {
  const float4 ambient = (float4) (0.05f, 0.05f, 0.05f, 0.f);
  float4 L = normalize(light - pt);
