@@ -55,7 +55,18 @@ $(info )
 #----------------------------------------------------------------------------------------#
 #----------------------------------------------------------------------------------------#		
 
-all: mandelgpu_sample juliagpu_sample mandelbulbgpu_sample smallptgpuv1_sample smallptgpuv2_sample
+all: all_1 all_2 all_3
+
+all_1: \
+	mandelgpu_sample \
+
+all_2: \
+	juliagpu_sample \
+	mandelbulbgpu_sample \
+
+all_3: \
+	smallptgpuv1_sample \
+	smallptgpuv2_sample \
 
 mandelgpu_sample:
 	$(call chdir,MandelGPU-v1.3/)
