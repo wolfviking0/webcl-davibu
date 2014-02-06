@@ -61,6 +61,12 @@ char captionBuffer[256];
 static int printHelp = 1;
 static int currentSphere;
 
+#ifdef __EMSCRIPTEN__
+	#include <emscripten/emscripten.h>
+	#define glRasterPos2i(x,y)
+	#define glRecti(x,y,z,w)
+#endif
+
 double WallClockTime() {
 #if defined(__linux__) || defined(__APPLE__)
 	struct timeval t;
@@ -75,11 +81,6 @@ double WallClockTime() {
 	Unsupported Platform !!!
 #endif
 }
-
-#ifdef __EMSCRIPTEN__
-	#define glRasterPos2i(x,y)
-	#define glRecti(x,y,z,w)
-#endif
 
 unsigned int TextureId;
 static unsigned int TextureTarget = GL_TEXTURE_2D;

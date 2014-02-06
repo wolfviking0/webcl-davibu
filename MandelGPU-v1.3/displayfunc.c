@@ -53,6 +53,12 @@ static int printHelp = 1;
 
 unsigned int *pixels = NULL;
 
+#ifdef __EMSCRIPTEN__
+	#include <emscripten/emscripten.h>
+	#define glRasterPos2i(x,y)
+	#define glRecti(x,y,z,w)
+#endif
+
 double WallClockTime() {
 #if defined(__linux__) || defined(__MACOSX)
 	struct timeval t;
@@ -68,10 +74,7 @@ double WallClockTime() {
 #endif
 }
 
-#ifdef __EMSCRIPTEN__
-	#define glRasterPos2i(x,y)
-	#define glRecti(x,y,z,w)
-#endif
+
 
 unsigned int TextureId;
 static unsigned int TextureTarget = GL_TEXTURE_2D;
