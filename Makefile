@@ -6,8 +6,13 @@
 #
 
 CURRENT_ROOT:=$(PWD)/
-
+	
+ORIG=0
+ifeq ($(ORIG),1)
+EMSCRIPTEN_ROOT:=$(CURRENT_ROOT)../emscripten
+else
 EMSCRIPTEN_ROOT:=$(CURRENT_ROOT)../webcl-translator/emscripten
+endif
 
 CXX = $(EMSCRIPTEN_ROOT)/em++
 
