@@ -25,6 +25,7 @@ $(info )
 EMSCRIPTEN_ROOT:=$(CURRENT_ROOT)../webcl-translator/emscripten
 endif
 
+CC = $(EMSCRIPTEN_ROOT)/emcc
 CXX = $(EMSCRIPTEN_ROOT)/em++
 
 CHDIR_SHELL := $(SHELL)
@@ -85,7 +86,7 @@ all_3: \
 
 mandelgpu_sample:
 	$(call chdir,MandelGPU-v1.3/)
-	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CC) \
 		mandelGPU.c \
 		displayfunc.c \
 	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
@@ -95,7 +96,7 @@ mandelgpu_sample:
 
 mandelbulbgpu_sample:
 	$(call chdir,mandelbulbGPU-v1.0/)
-	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CC) \
 		mandelbulbGPU.c \
 		displayfunc.c \
 	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
@@ -104,7 +105,7 @@ mandelbulbgpu_sample:
 
 juliagpu_sample:
 	$(call chdir,JuliaGPU-v1.2/)
-	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CC) \
 		juliaGPU.c \
 		displayfunc.c \
 	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \
@@ -113,7 +114,7 @@ juliagpu_sample:
 
 smallptgpuv1_sample:
 	$(call chdir,smallptGPU-v1.6/)
-	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CXX) \
+	JAVA_HEAP_SIZE=8096m $(EMCCDEBUG)=1 $(CC) \
 		smallptGPU.c \
 		displayfunc.c \
 	$(MODE) -s GL_FFP_ONLY=1 -s LEGACY_GL_EMULATION=1 \

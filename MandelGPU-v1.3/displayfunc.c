@@ -57,6 +57,8 @@ unsigned int *pixels = NULL;
 	#include <emscripten/emscripten.h>
 	#define glRasterPos2i(x,y)
 	#define glRecti(x,y,z,w)
+	#undef GLUT_BITMAP_HELVETICA_18
+	#define GLUT_BITMAP_HELVETICA_18 (void*)""
 #endif
 
 double WallClockTime() {

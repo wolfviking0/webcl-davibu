@@ -31,7 +31,12 @@
 #else
         Unsupported Platform !!!
 #endif
-
+#ifdef __EMSCRIPTEN__
+    #undef GLUT_BITMAP_9_BY_15
+	#define GLUT_BITMAP_9_BY_15 (void*)""
+    #undef GLUT_BITMAP_8_BY_13
+	#define GLUT_BITMAP_8_BY_13 (void*)""
+#endif
 // Jens's patch for MacOS
 #if defined(__APPLE__)
 #include <GLut/glut.h>

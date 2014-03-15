@@ -49,6 +49,10 @@ double WallClockTime() {
 #ifdef __EMSCRIPTEN__
 	#define glRasterPos2i(x,y)
 	#define glRecti(x,y,z,w)
+    #undef GLUT_BITMAP_9_BY_15
+	#define GLUT_BITMAP_9_BY_15 (void*)""
+    #undef GLUT_BITMAP_8_BY_13
+	#define GLUT_BITMAP_8_BY_13 (void*)""
 #endif
 
 unsigned int TextureId;

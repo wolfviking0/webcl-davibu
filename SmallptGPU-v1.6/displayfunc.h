@@ -32,7 +32,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #else
 #include <GL/glut.h>
 #endif
-
+#ifdef __EMSCRIPTEN__
+    #undef GLUT_BITMAP_9_BY_15
+	#define GLUT_BITMAP_9_BY_15 (void*)""
+    #undef GLUT_BITMAP_8_BY_13
+	#define GLUT_BITMAP_8_BY_13 (void*)""
+#endif
 #include "vec.h"
 
 extern int width;
