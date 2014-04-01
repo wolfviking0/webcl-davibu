@@ -53,7 +53,7 @@ static cl_command_queue commandQueue;
 static cl_program program;
 static cl_kernel kernel;
 static unsigned int workGroupSize = 1;
-static char *kernelFileName = "preprocessed_rendering_kernel.cl";
+static char *kernelFileName = "preprocessed_rendering_kernel_mandelbulb.cl";
 
 static void FreeBuffers() {
 	cl_int status = clReleaseMemObject(pixelBuffer);
