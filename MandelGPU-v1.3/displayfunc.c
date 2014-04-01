@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(__linux__) || defined(__MACOSX) || defined(__EMSCRIPTEN__)
+#if defined(__linux__) || defined(__APPLE__) || defined(__EMSCRIPTEN__)
 #include <sys/time.h>
 #elif defined (WIN32)
 #include <windows.h>
@@ -62,7 +62,7 @@ unsigned int *pixels = NULL;
 #endif
 
 double WallClockTime() {
-#if defined(__linux__) || defined(__MACOSX)
+#if defined(__linux__) || defined(__APPLE__)
 	struct timeval t;
 	gettimeofday(&t, NULL);
 

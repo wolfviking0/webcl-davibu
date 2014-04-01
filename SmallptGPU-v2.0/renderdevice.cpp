@@ -59,9 +59,9 @@ RenderDevice::RenderDevice(const cl::Device &device, const string &kernelFileNam
 #if defined(__EMSCRIPTEN__)
 		program.build(buildDevice, "");
 #elif defined(__APPLE__)
-		program.build(buildDevice, "-I. -D__APPLE__");
+		program.build(buildDevice, "");
 #else
-		program.build(buildDevice, "-I.");
+		program.build(buildDevice, "");
 #endif
 		cl::string result = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
 		cerr << "[Device::" << deviceName << "]" << " Compilation result: " << result.c_str() << endl;

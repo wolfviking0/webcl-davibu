@@ -103,6 +103,12 @@ SOURCES_mandelbulbgpu	=	mandelbulbGPU.c displayfunc.c
 SOURCES_smallptgpu1		=	smallptGPU.c displayfunc.c
 SOURCES_smallptgpu2		=	smallptGPU.cpp renderconfig.cpp displayfunc.cpp renderdevice.cpp
 
+INCLUDES_mandelgpu		=	-I./
+INCLUDES_juliagpu		=	-I./
+INCLUDES_mandelbulbgpu	= 	-I./
+INCLUDES_smallptgpu1	=	-I./
+INCLUDES_smallptgpu2	=	-I./ -I$(EMSCRIPTEN_ROOT)/system/include/
+
 ifeq ($(NAT),0)
 
 KERNEL_mandelgpu		= 	--preload-file rendering_kernel_float4.cl
@@ -154,23 +160,23 @@ mkdir:
 
 mandelgpu_sample: mkdir
 	$(call chdir,MandelGPU-v1.3/)
-	$(COPY_mandelgpu) 		$(GLOBAL) $(CC)	 $(CFLAGS) $(CFLAGS_mandelgpu)		$(INCLUDES_common)	$(SOURCES_mandelgpu)		$(VALPARAM_mandelgpu) 		$(KERNEL_mandelgpu) 		-o $(BUILD_FOLDER)$(PREFIX)mandelgpu$(EXTENSION) 
+	$(COPY_mandelgpu) 		$(GLOBAL) $(CC)	 $(CFLAGS) $(CFLAGS_mandelgpu)		$(INCLUDES_mandelgpu)		$(SOURCES_mandelgpu)		$(VALPARAM_mandelgpu) 		$(KERNEL_mandelgpu) 		-o $(BUILD_FOLDER)$(PREFIX)mandelgpu$(EXTENSION) 
 
 juliagpu_sample: mkdir
 	$(call chdir,JuliaGPU-v1.2/)
-	$(COPY_juliagpu) 		$(GLOBAL) $(CC)  $(CFLAGS) $(CFLAGS_juliagpu)		$(INCLUDES_common)	$(SOURCES_juliagpu)			$(VALPARAM_juliagpu) 		$(KERNEL_juliagpu) 			-o $(BUILD_FOLDER)$(PREFIX)juliagpu$(EXTENSION) 
+	$(COPY_juliagpu) 		$(GLOBAL) $(CC)  $(CFLAGS) $(CFLAGS_juliagpu)		$(INCLUDES_juliagpu)		$(SOURCES_juliagpu)			$(VALPARAM_juliagpu) 		$(KERNEL_juliagpu) 			-o $(BUILD_FOLDER)$(PREFIX)juliagpu$(EXTENSION) 
 
 mandelbulbgpu_sample: mkdir
 	$(call chdir,mandelbulbGPU-v1.0/)
-	$(COPY_mandelbulbgpu) 	$(GLOBAL) $(CC)  $(CFLAGS) $(CFLAGS_mandelbulbgpu)	$(INCLUDES_common)	$(SOURCES_mandelbulbgpu)	$(VALPARAM_mandelbulbgpu) 	$(KERNEL_mandelbulbgpu) 	-o $(BUILD_FOLDER)$(PREFIX)mandelbulbgpu$(EXTENSION) 
+	$(COPY_mandelbulbgpu) 	$(GLOBAL) $(CC)  $(CFLAGS) $(CFLAGS_mandelbulbgpu)	$(INCLUDES_mandelbulbgpu)	$(SOURCES_mandelbulbgpu)	$(VALPARAM_mandelbulbgpu) 	$(KERNEL_mandelbulbgpu) 	-o $(BUILD_FOLDER)$(PREFIX)mandelbulbgpu$(EXTENSION) 
 
 smallptgpu1_sample: mkdir
 	$(call chdir,smallptGPU-v1.6/)
-	$(COPY_smallptgpu1) 	$(GLOBAL) $(CC)  $(CFLAGS) $(CFLAGS_smallptgpu1)	$(INCLUDES_common)	$(SOURCES_smallptgpu1)		$(VALPARAM_smallptgpu1) 	$(KERNEL_smallptgpu1) 		-o $(BUILD_FOLDER)$(PREFIX)smallptgpu1$(EXTENSION) 
+	$(COPY_smallptgpu1) 	$(GLOBAL) $(CC)  $(CFLAGS) $(CFLAGS_smallptgpu1)	$(INCLUDES_smallptgpu1)		$(SOURCES_smallptgpu1)		$(VALPARAM_smallptgpu1) 	$(KERNEL_smallptgpu1) 		-o $(BUILD_FOLDER)$(PREFIX)smallptgpu1$(EXTENSION) 
 
 smallptgpu2_sample: mkdir
 	$(call chdir,SmallptGPU-v2.0/)
-	$(COPY_smallptgpu2) 	$(GLOBAL) $(CXX) $(CFLAGS) $(CFLAGS_smallptgpu2)	$(INCLUDES_common)	$(SOURCES_smallptgpu2)		$(VALPARAM_smallptgpu2) 	$(KERNEL_smallptgpu2) 		-o $(BUILD_FOLDER)$(PREFIX)smallptgpu2$(EXTENSION) 
+	$(COPY_smallptgpu2) 	$(GLOBAL) $(CXX) $(CFLAGS) $(CFLAGS_smallptgpu2)	$(INCLUDES_smallptgpu2)		$(SOURCES_smallptgpu2)		$(VALPARAM_smallptgpu2) 	$(KERNEL_smallptgpu2) 		-o $(BUILD_FOLDER)$(PREFIX)smallptgpu2$(EXTENSION) 
 
 clean:
 	rm -rf bin/

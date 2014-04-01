@@ -32,7 +32,7 @@ and Enforcer's http://www.fractalforums.com/mandelbulb-implementation/realtime-r
 #include <math.h>
 
 // Jens's patch for MacOS
-#ifdef __MACOSX
+#ifdef __APPLE__
 #include <OpenCL/opencl.h>
 #else
 #include <CL/cl.h>

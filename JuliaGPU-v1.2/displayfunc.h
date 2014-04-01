@@ -27,7 +27,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <math.h>
 
 // Jens's patch for MacOS
-#ifdef __MACOSX
+#ifdef __APPLE__
 #include <GLut/glut.h>
 #else
 #include <GL/glut.h>
