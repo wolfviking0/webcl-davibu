@@ -59,7 +59,7 @@ RenderDevice::RenderDevice(const cl::Device &device, const string &kernelFileNam
 #if defined(__EMSCRIPTEN__)
 		program.build(buildDevice, "");
 #elif defined(__APPLE__)
-		program.build(buildDevice, "");
+		program.build(buildDevice, "-D__APPLE__");
 #else
 		program.build(buildDevice, "");
 #endif
