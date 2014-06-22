@@ -76,6 +76,7 @@ static void AllocateBuffers() {
 
 	cl_int status;
 	cl_uint sizeBytes = 3 * sizeof(float) * pixelCount;
+	CL_SET_TYPE_POINTER(CL_FLOAT)
     pixelBuffer = clCreateBuffer(
             context,
             CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
@@ -88,6 +89,7 @@ static void AllocateBuffers() {
     }
 
 	sizeBytes = sizeof(RenderingConfig);
+	CL_SET_TYPE_POINTER(CL_FLOAT)
 	configBuffer = clCreateBuffer(
 			context,
 			CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
@@ -405,6 +407,7 @@ static void SetUpOpenCL() {
 }
 
 static void SetEnableAccumulationKernelArg(const int enableAccumulation, const float x, const float y) {
+	CL_SET_TYPE_POINTER(CL_SIGNED_INT32)
 	cl_int status = clSetKernelArg(
 		kernel,
 		2,
@@ -414,7 +417,7 @@ static void SetEnableAccumulationKernelArg(const int enableAccumulation, const f
 		fprintf(stderr, "Failed to set OpenCL arg. #2: %d\n", status);
 		exit(-1);
 	}
-
+	CL_SET_TYPE_POINTER(CL_FLOAT)
 	status = clSetKernelArg(
 		kernel,
 		3,
@@ -424,7 +427,7 @@ static void SetEnableAccumulationKernelArg(const int enableAccumulation, const f
 		fprintf(stderr, "Failed to set OpenCL arg. #3: %d\n", status);
 		exit(-1);
 	}
-
+	CL_SET_TYPE_POINTER(CL_FLOAT)
 	status = clSetKernelArg(
 		kernel,
 		4,

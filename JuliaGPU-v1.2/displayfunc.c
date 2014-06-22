@@ -25,6 +25,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef __EMSCRIPTEN__
+	#define CL_SET_TYPE_POINTER(x)
+#endif
+
 #if defined(__linux__) || defined(__APPLE__) || defined(__EMSCRIPTEN__)
 #include <sys/time.h>
 #elif defined (WIN32)
